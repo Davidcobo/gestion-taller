@@ -7,7 +7,7 @@ st.set_page_config(page_title="ERP Taller", layout="wide")
 # CONEXIÓN SIMPLIFICADA (Usando el enlace CSV de Google)
 # 1. VE A TU EXCEL -> ARCHIVO -> COMPARTIR -> PUBLICAR EN LA WEB
 # 2. SELECCIONA "VALORES SEPARADOS POR COMAS (.CSV)" Y COPIA ESE ENLACE
-URL_CSV = "PEGA_AQUÍ_TU_ENLACE_DE_PUBLICAR_COMO_CSV"
+URL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQeWJBHleP3jFxYj1Xb1eSvJiOT3S8cEN-6OU91d8CAxQtYZCPfqmqjflSIuzdPFZ2IZ5-T4R2hDInm/pub?output=csv"
 
 try:
     df = pd.read_csv(URL_CSV)
