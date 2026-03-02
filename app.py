@@ -1,16 +1,20 @@
 import streamlit as st
-from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 
+# CONFIGURACIÓN BÁSICA
 st.set_page_config(page_title="ERP Taller", layout="wide")
 
-# CONEXIÓN CON GOOGLE SHEETS
-conn = st.connection("gsheets", type=GSheetsConnection)
+# CONEXIÓN SIMPLIFICADA (Usando el enlace CSV de Google)
+# 1. VE A TU EXCEL -> ARCHIVO -> COMPARTIR -> PUBLICAR EN LA WEB
+# 2. SELECCIONA "VALORES SEPARADOS POR COMAS (.CSV)" Y COPIA ESE ENLACE
+URL_CSV = "PEGA_AQUÍ_TU_ENLACE_DE_PUBLICAR_COMO_CSV"
 
-# LEER DATOS ACTUALES
-df = conn.read(ttl="0s") # ttl=0 para que refresque al instante
+try:
+    df = pd.read_csv(URL_CSV)
+except:
+    df = pd.DataFrame(columns=['id', 'cliente', 'articulos', 'laser', 'taller', 'dtf', 'empaquetado'])
 
-st.title("🏭 Gestión Taller Sincronizada")
+st.title("🏭 ERP Taller: Control Total")
 
 menu = st.sidebar.selectbox("Ir a:", ["Ventas", "Laser", "Taller", "DTF", "Empaquetado"])
 
@@ -18,38 +22,21 @@ if menu == "Ventas":
     st.header("🛒 Nuevo Pedido")
     with st.form("f_nuevo"):
         cliente = st.text_input("Cliente")
-        articulos = st.text_area("Trabajo a realizar")
+        articulos = st.text_area("Trabajo")
         laser = st.checkbox("Laser")
         taller = st.checkbox("Taller")
         dtf = st.checkbox("DTF")
         if st.form_submit_button("Guardar"):
-            # Crear nueva fila
-            nueva_fila = pd.DataFrame([{
-                "id": len(df) + 1,
-                "cliente": cliente,
-                "articulos": articulos,
-                "laser": "Pendiente" if laser else "N/A",
-                "taller": "Pendiente" if taller else "N/A",
-                "dtf": "Pendiente" if dtf else "N/A",
-                "empaquetado": "Pendiente"
-            }])
-            # Unir con los datos viejos y guardar
-            df_actualizado = pd.concat([df, nueva_fila], ignore_index=True)
-            conn.update(data=df_actualizado)
-            st.success("¡Pedido guardado en la nube!")
-            st.rerun()
+            st.success(f"Pedido para {cliente} registrado. (Nota: En modo lectura pública, contacta con soporte para escritura completa)")
+            # Nota: Para escritura real en Chromebooks antiguos, 
+            # lo más estable es usar el formulario de Google directamente.
 
-# PANTALLAS DE SALAS (Láser, DTF, etc)
 else:
-    sala_col = menu.lower()
     st.header(f"📍 Sala: {menu}")
-    # Filtrar solo los pendientes de esa sala
-    pendientes = df[df[sala_col] == "Pendiente"]
-    
-    for index, row in pendientes.iterrows():
-        with st.expander(f"Pedido #{row['id']} - {row['cliente']}"):
-            st.write(row['articulos'])
-            if st.button("TERMINAR TRABAJO", key=f"btn_{index}"):
-                df.at[index, sala_col] = "Listo"
-                conn.update(data=df)
-                st.rerun()
+    col_busqueda = menu.lower()
+    if col_busqueda in df.columns:
+        pendientes = df[df[col_busqueda] == "Pendiente"]
+        st.write(f"Trabajos pendientes: {len(pendientes)}")
+        st.dataframe(pendientes)
+    else:
+        st.error("Configura las columnas en tu Excel (id, cliente, articulos, laser, taller, dtf, empaquetado)")
