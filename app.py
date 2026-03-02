@@ -12,14 +12,14 @@ df = conn.read(ttl="0s") # ttl=0 para que refresque al instante
 
 st.title("🏭 Gestión Taller Sincronizada")
 
-menu = st.sidebar.selectbox("Ir a:", ["Ventas", "Láser", "Taller", "DTF", "Empaquetado"])
+menu = st.sidebar.selectbox("Ir a:", ["Ventas", "Laser", "Taller", "DTF", "Empaquetado"])
 
 if menu == "Ventas":
     st.header("🛒 Nuevo Pedido")
     with st.form("f_nuevo"):
         cliente = st.text_input("Cliente")
         articulos = st.text_area("Trabajo a realizar")
-        laser = st.checkbox("Láser")
+        laser = st.checkbox("Laser")
         taller = st.checkbox("Taller")
         dtf = st.checkbox("DTF")
         if st.form_submit_button("Guardar"):
